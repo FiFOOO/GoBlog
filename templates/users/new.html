@@ -1,13 +1,17 @@
-  <div class="auth-wrapper">
-  <div class="sign-form">
-    <h1>Register</h1>
-
-    <%= form_for(user, {action: usersPath()}) { %>
-      <%= f.InputTag("Email") %>
-      <%= f.InputTag("Password", {type: "password"}) %>
-      <%= f.InputTag("PasswordConfirmation", {type: "password"}) %>
-      
-      <button class="btn btn-success">Register!</button>
-    <% } %>
-  </div>
+<% contentFor("subtitle") { %>
+	<div class="subtitle">
+		<div class="container">
+			<h3>Register</h3>
+		</div>
+	</div>
+<% } %>
+<div class="auth-wrapper">
+	<div class="sign-form">
+		<%= form_for(user, {action: usersPath()}) { %>
+			<%= f.InputTag("Email") %>
+			<%= f.InputTag("Password", {type: "password"}) %>
+			<%= f.InputTag("PasswordConfirmation", {type: "password"}) %>
+			<button class="btn btn-success">Register!</button>
+		<% } %>
+	</div>
 </div>

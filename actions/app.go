@@ -1,10 +1,13 @@
 package actions
 
 import (
+	"strings"
+
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
 	"github.com/gobuffalo/envy"
+	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/unrolled/secure"
 
 	"github.com/Filip/blog/models"
@@ -52,10 +55,11 @@ func App() *buffalo.App {
 		app.Use(func(next buffalo.Handler) buffalo.Handler {
 			return func(c buffalo.Context) error {
 				c.Set("year", time.Now().Year())
+				c.Set("stripTag", strip.StripTags)
+				c.Set("replace", strings.Replace)
 				return next(c)
 			}
 		})
-
 		app.GET("/", HomeHandler)
 
 		app.Use(SetCurrentUser)

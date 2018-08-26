@@ -1,19 +1,24 @@
-<div class="page-header">
-  <h1>Article#Show</h1>
-</div>
+<% contentFor("subtitle") { %>
+	<div class="subtitle">
+		<div class="container">
+			<h3><%= article.Title %></h3>
+			<div class="link"><a href="<%= newArticlesPath() %>">New</a></div>
+			<div class="link"><a href="<%= articlesPath() %>">List</a></div>
+	  	</div>
+ 	</div>
+<% } %>
 
 <ul class="list-unstyled list-inline">
-  <li class="list-inline-item"><a href="<%= articlesPath() %>" class="btn btn-info">Back to all Articles</a></li>
-  <li class="list-inline-item"><a href="<%= editArticlePath({ article_id: article.ID })%>" class="btn btn-warning">Edit</a></li>
-  <li class="list-inline-item"><a href="<%= articlePath({ article_id: article.ID })%>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Delete</a>
+	<li class="list-inline-item"><a href="<%= articlesPath() %>" class="btn btn-info">Back to all Articles</a></li>
+	<li class="list-inline-item"><a href="<%= editArticlePath({ article_id: article.ID })%>" class="btn btn-warning">Edit</a></li>
+	<li class="list-inline-item"><a href="<%= articlePath({ article_id: article.ID })%>" data-method="DELETE" data-confirm="Are you sure?" class="btn btn-danger">Delete</a>
 </ul>
 
 <p>
-  <strong>Title</strong>: <%= article.Title %>
+	<strong>Title</strong>: <%= article.Title %>
 </p>
 <p>
-  <strong>Content</strong>: <%= article.Content %>
-</p>
-<p>
-  <strong>UserID</strong>: <%= article.UserID %>
+	<strong>Content</strong>: 
+	<br> 
+	<%= markdown(article.Content) %>
 </p>

@@ -1,24 +1,22 @@
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Blog</title>
-    <%= stylesheetTag("application.css") %>
-    <meta name="csrf-param" content="authenticity_token" />
-    <meta name="csrf-token" content="<%= authenticity_token %>" />
-  </head>
-  <body>
-    <%= partial("nav.html") %>
+	<head>
+		<meta charset="utf-8">
+		<title>GoBlog</title>
+		<%= stylesheetTag("application.css") %>
+		<meta name="csrf-param" content="authenticity_token" />
+		<meta name="csrf-token" content="<%= authenticity_token %>" />
+	</head>
+	<body>
+		<%= partial("nav.html") %>
+		<div class="container">
+			<%= yield %>
+		</div>
 
-    <div class="container">
-      <%= yield %>
-    </div>
-
-    <%= partial("footer.html") %>
-
-    <%= javascriptTag("application.js") %>
-  </body>
+		<%= partial("footer.html") %>
+	</body>
+	<%= javascriptTag("application.js") %>
 </html>
 
 <script>
-    let flash = <%= json(flash) %>
+	let flash = <%= json(flash) %>;
 </script>

@@ -73,6 +73,7 @@ body>.container {
   font-size: 22px;
   font-weight: 400;
   margin: 0;
+  display: inline-block;
 }
 
 // NOTY
@@ -85,4 +86,16 @@ body>.container {
   bottom: 75px;
   right: 20px;
   width: 325px;
+}
+
+.link {
+  display: inline-block;
+  a {
+    margin-left: 10px;
+    color: #9d9d9d;
+  }
+  a:hover {
+    color: #fff;
+    background-color: transparent;
+  }
 }

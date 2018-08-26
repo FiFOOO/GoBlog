@@ -24,27 +24,30 @@ type ArticlesResource struct {
 	buffalo.Resource
 }
 
+func (v ArticlesResource) scope(c buffalo.Context) (*pop.Query, error) {
+	tx, ok := c.Value("tx").(*pop.Connection)
+	if !ok {
+		return nil, errors.WithStack(errors.New("no transaction found"))
+	}
+	return tx.Where("user_id = ?", c.Session().Get("current_user_id")), nil
+}
+
 // List gets all Articles. This function is mapped to the path
 // GET /articles
 func (v ArticlesResource) List(c buffalo.Context) error {
-	// Get the DB connection from the context
-	tx, ok := c.Value("tx").(*pop.Connection)
-	if !ok {
-		return errors.WithStack(errors.New("no transaction found"))
-	}
-
 	articles := &models.Articles{}
 
-	// Paginate results. Params "page" and "per_page" control pagination.
-	// Default values are "page=1" and "per_page=20".
-	q := tx.PaginateFromParams(c.Params())
+	q, err := v.scope(c)
 
-	// Retrieve all Articles from the DB
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	q = q.PaginateFromParams(c.Params())
+
 	if err := q.All(articles); err != nil {
 		return errors.WithStack(err)
 	}
 
-	// Add the paginator to the context so it can be used in the template.
 	c.Set("pagination", q.Paginator)
 
 	return c.Render(200, r.Auto(c, articles))
@@ -92,6 +95,9 @@ func (v ArticlesResource) Create(c buffalo.Context) error {
 	if !ok {
 		return errors.WithStack(errors.New("no transaction found"))
 	}
+
+	user := c.Value("current_user").(*models.User)
+	article.UserID = user.ID
 
 	// Validate the data from the html form
 	verrs, err := tx.ValidateAndCreate(article)
