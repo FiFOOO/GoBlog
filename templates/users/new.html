@@ -1,8 +1,13 @@
-<div class="page-header">
-  <h1>New User</h1>
-</div>
+  <div class="auth-wrapper">
+  <div class="sign-form">
+    <h1>Register</h1>
 
-<%= form_for(user, {action: usersPath(), method: "POST"}) { %>
-  <%= partial("users/form.html") %>
-  <a href="<%= usersPath() %>" class="btn btn-warning" data-confirm="Are you sure?">Cancel</a>
-<% } %>
+    <%= form_for(user, {action: usersPath()}) { %>
+      <%= f.InputTag("Email") %>
+      <%= f.InputTag("Password", {type: "password"}) %>
+      <%= f.InputTag("PasswordConfirmation", {type: "password"}) %>
+      
+      <button class="btn btn-success">Register!</button>
+    <% } %>
+  </div>
+</div>

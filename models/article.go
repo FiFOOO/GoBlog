@@ -17,7 +17,6 @@ type Article struct {
 	Title     string    `json:"title" db:"title"`
 	Content   string    `json:"content" db:"content"`
 	UserID    uuid.UUID `json:"user_id" db:"user_id"`
-	User      User      `belongs_to:"user" db:"-"`
 }
 
 // String is not required by pop and may be deleted

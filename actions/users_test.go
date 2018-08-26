@@ -1,29 +1,29 @@
 package actions
 
-func (as *ActionSuite) Test_UsersResource_List() {
-	as.Fail("Not Implemented!")
+import (
+  "github.com/Filip/blog/models"
+)
+
+func (as *ActionSuite) Test_Users_New() {
+	res := as.HTML("/users/new").Get()
+	as.Equal(200, res.Code)
 }
 
-func (as *ActionSuite) Test_UsersResource_Show() {
-	as.Fail("Not Implemented!")
-}
+func (as *ActionSuite) Test_Users_Create() {
+	count, err := as.DB.Count("users")
+	as.NoError(err)
+	as.Equal(0, count)
 
-func (as *ActionSuite) Test_UsersResource_New() {
-	as.Fail("Not Implemented!")
-}
+	u := &models.User{
+		Email:                "mark@example.com",
+		Password:             "password",
+		PasswordConfirmation: "password",
+	}
 
-func (as *ActionSuite) Test_UsersResource_Create() {
-	as.Fail("Not Implemented!")
-}
+	res := as.HTML("/users").Post(u)
+	as.Equal(302, res.Code)
 
-func (as *ActionSuite) Test_UsersResource_Edit() {
-	as.Fail("Not Implemented!")
-}
-
-func (as *ActionSuite) Test_UsersResource_Update() {
-	as.Fail("Not Implemented!")
-}
-
-func (as *ActionSuite) Test_UsersResource_Destroy() {
-	as.Fail("Not Implemented!")
+	count, err = as.DB.Count("users")
+	as.NoError(err)
+	as.Equal(1, count)
 }

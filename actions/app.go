@@ -11,6 +11,8 @@ import (
 	"github.com/gobuffalo/buffalo/middleware/csrf"
 	"github.com/gobuffalo/buffalo/middleware/i18n"
 	"github.com/gobuffalo/packr"
+
+	"time"
 )
 
 // ENV is used to help switch settings based on where the
@@ -47,11 +49,24 @@ func App() *buffalo.App {
 		// Setup and use translations:
 		app.Use(translations())
 
-		app.GET("/", HomeHandler)
-		app.GET("/users/filter", TestingHandler)
-		app.Resource("/users", UsersResource{})
-		app.Resource("/articles", ArticlesResource{})
+		app.Use(func(next buffalo.Handler) buffalo.Handler {
+			return func(c buffalo.Context) error {
+				c.Set("year", time.Now().Year())
+				return next(c)
+			}
+		})
 
+		app.GET("/", HomeHandler)
+
+		app.Use(SetCurrentUser)
+		app.Use(Authorize)
+		app.GET("/users/new", UsersNew)
+		app.POST("/users", UsersCreate)
+		app.GET("/signin", AuthNew)
+		app.POST("/signin", AuthCreate)
+		app.DELETE("/signout", AuthDestroy)
+		app.Middleware.Skip(Authorize, HomeHandler, UsersNew, UsersCreate, AuthNew, AuthCreate)
+		app.Resource("/articles", ArticlesResource{})
 		app.ServeFiles("/", assetsBox) // serve files from the public directory
 	}
 

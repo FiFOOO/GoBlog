@@ -93,23 +93,11 @@ func (v ArticlesResource) Create(c buffalo.Context) error {
 		return errors.WithStack(errors.New("no transaction found"))
 	}
 
-	users := []models.User{}
-	err1 := tx.Where("email = ?", "splinter1231@gmail.com").All(&users)
-	if err1 == nil {
-		article.UserID = users[0].ID
-		article.User = users[0]
-	}
-
 	// Validate the data from the html form
 	verrs, err := tx.ValidateAndCreate(article)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-
-	// article2 := &models.Article{}
-	// article2.Title = c.Param("content")
-	// article2.Content = c.Param("content")
-	// tx.Create(article2)
 
 	if verrs.HasAny() {
 		// Make the errors available inside the html template
