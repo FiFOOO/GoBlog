@@ -47,7 +47,6 @@ func (v ArticlesResource) List(c buffalo.Context) error {
 	if err := q.All(articles); err != nil {
 		return errors.WithStack(err)
 	}
-
 	c.Set("pagination", q.Paginator)
 
 	return c.Render(200, r.Auto(c, articles))

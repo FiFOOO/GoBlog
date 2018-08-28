@@ -1,0 +1,1 @@
+add_column("articles", "title_image", "string", {})

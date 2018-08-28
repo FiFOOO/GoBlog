@@ -33,3 +33,5 @@
 <div class="text-center">
   <%= paginator(pagination) %>
 </div>
+
+<%= partial("page_indicator.html", {plural: "Articles", basePath: articlesPath()}) %>
