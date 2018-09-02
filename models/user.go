@@ -22,6 +22,7 @@ type User struct {
 	PasswordHash         string    `json:"password_hash" db:"password_hash"`
 	Password             string    `json:"-" db:"-"`
 	PasswordConfirmation string    `json:"-" db:"-"`
+	Articles             Articles  `has_many:"articles"`
 }
 
 // String is not required by pop and may be deleted

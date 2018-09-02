@@ -21,6 +21,7 @@ type Article struct {
 	UpdatedAt        time.Time    `json:"updated_at" db:"updated_at"`
 	Title            string       `json:"title" db:"title"`
 	Content          string       `json:"content" db:"content"`
+	User             User         `belongs_to:"user"`
 	UserID           uuid.UUID    `json:"user_id" db:"user_id"`
 	TitleImage       binding.File `db:"-" form:"TitleImage"`
 	PathToTitleImage string       `json:"title_image" db:"title_image"`
@@ -70,6 +71,12 @@ func (a *Article) BeforeDestroy(tx *pop.Connection) error {
 // Validate gets run every time you call a "pop.Validate*" (pop.ValidateAndSave, pop.ValidateAndCreate, pop.ValidateAndUpdate) method.
 // This method is not required and may be deleted.
 func (a *Article) Validate(tx *pop.Connection) (*validate.Errors, error) {
+	return validate.NewErrors(), nil
+}
+
+// ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.
+// This method is not required and may be deleted.
+func (a *Article) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
 	return validate.Validate(
 		&validators.StringIsPresent{Field: a.Title, Name: "Title"},
 		&validators.StringIsPresent{Field: a.Content, Name: "Content"},
@@ -77,14 +84,11 @@ func (a *Article) Validate(tx *pop.Connection) (*validate.Errors, error) {
 	), nil
 }
 
-// ValidateCreate gets run every time you call "pop.ValidateAndCreate" method.
-// This method is not required and may be deleted.
-func (a *Article) ValidateCreate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.NewErrors(), nil
-}
-
 // ValidateUpdate gets run every time you call "pop.ValidateAndUpdate" method.
 // This method is not required and may be deleted.
 func (a *Article) ValidateUpdate(tx *pop.Connection) (*validate.Errors, error) {
-	return validate.NewErrors(), nil
+	return validate.Validate(
+		&validators.StringIsPresent{Field: a.Title, Name: "Title"},
+		&validators.StringIsPresent{Field: a.Content, Name: "Content"},
+	), nil
 }
