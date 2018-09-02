@@ -3,4 +3,5 @@ create_table("articles") {
 	t.Column("title", "string", {})
 	t.Column("content", "text", {})
 	t.Column("user_id", "uuid", {})
+	t.ForeignKey("user_id", {"users": ["id"]}, {"on_delete": "cascade"})
 }

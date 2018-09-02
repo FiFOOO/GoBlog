@@ -41,12 +41,11 @@ func (a Articles) String() string {
 	return string(ja)
 }
 
-func (a *Article) AfterCreate(tx *pop.Connection) error {
+func (a *Article) BeforeCreate(tx *pop.Connection) error {
 	if !a.TitleImage.Valid() {
 		return nil
 	}
-
-	dir := filepath.Join(".", "media/article-image")
+	dir := filepath.Join(".", "public/assets/media/article-image")
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return errors.WithStack(err)
 	}
@@ -56,13 +55,13 @@ func (a *Article) AfterCreate(tx *pop.Connection) error {
 	}
 	defer f.Close()
 	_, err = io.Copy(f, a.TitleImage)
-	a.PathToTitleImage = filepath.Join(dir, a.TitleImage.Filename)
-	tx.Update(a)
+	a.PathToTitleImage = filepath.Join("media/article-image", a.TitleImage.Filename)
 	return err
 }
 
 func (a *Article) BeforeDestroy(tx *pop.Connection) error {
-	if err := os.Remove(a.PathToTitleImage); err != nil {
+	dir := filepath.Join("public/assets/", a.PathToTitleImage)
+	if err := os.Remove(dir); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil
