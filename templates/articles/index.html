@@ -1,7 +1,7 @@
 <% contentFor("subtitle") { %>
 	<div class="subtitle">
 		<div class="container">
-			<h3>Article</h3>
+			<h3>Articles</h3>
 			<div class="link"><a href="<%= newArticlesPath() %>">New</a></div>
 	  	</div>
  	</div>
@@ -34,7 +34,7 @@
   <%= paginator(pagination) %>
 </div>
 
-<%= partial("page_indicator.html", {plural: "Articles", basePath: articlesPath()}) %>
+<!-- <%= partial("page_indicator.html", {plural: "Articles", basePath: articlesPath()}) %> -->
 
 
 <% contentFor("scripts") { %>

@@ -1,0 +1,54 @@
+<% contentFor("subtitle") { %>
+	<div class="subtitle">
+		<div class="container">
+            <h3>Home</h3>
+            <input class="search" type="text" placeholder="search" id="search_article" name="title" autocomplete="off">
+		</div>
+	</div>
+<% } %>
+
+
+<div id="result">
+    <%= for (a) in articles { %>
+        <a class="a_hover"  href="<%= articleDetailPath({ article_id: a.ID }) %>">
+            <div class="row article">
+                <div class="col-md-4">
+                    <img src="<%= assetPath(a.PathToTitleImage) %>" height="200px" alt="">
+                    <% let content = replace(stripTag(a.Content), "&nbsp;", " ", 0-1)%>
+                </div>
+                <div class="col-md-8">
+                    <div class="text">
+                        <h1><%= a.Title %></h1>
+                        <p><%= truncate(content, {"size": 450}) %></p>
+                        <div class="time">
+                            <%= a.CreatedAt.Format("January 2, 2006, 15:04") %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a> 
+    <% } %>
+</div>
+
+<div class="text-center">
+    <%= paginator(pagination) %>
+</div>
+
+
+<% contentFor("scripts") { %>
+	<script>
+        $('#search_article').keyup(function() {
+            $.ajax({
+                method: "POST",
+                url: "/async/search-article",
+                data: { 
+                    title: $('#search_article').val(),
+                    authenticity_token: "<%= authenticity_token %>"
+                }
+              })
+            .done(function(data) {
+                writeData(data);
+            });
+        });
+	</script>
+<% } %>

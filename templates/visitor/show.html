@@ -1,0 +1,90 @@
+<% contentFor("subtitle") { %>
+	<div class="subtitle">
+		<div class="container">
+			<h3><%= article.Title %></h3>
+		</div>
+	</div>
+<% } %>
+
+
+<div class="col-md-12">
+	<div class="img" style="background-image: url('<%= assetPath(article.PathToTitleImage) %>')" alt=""></div>
+</div>
+<div class="col-md-10 col-md-offset-1">
+	<%= markdown(article.Content) %>
+</div>
+
+
+
+<div class="col-md-10 col-md-offset-1">
+	<div class="message">
+		<%= for (msg) in messages { %>
+			<div class="row">
+				<div class="col-md-1 profil-img" style="background-image:url('https://placeimg.com/640/480/people')"></div>
+				<div class="col-md-11 coment">
+					<div class="title row">
+						<p class="name"><%= msg.User.FirstName + " " + msg.User.LastName %> </p>
+						<p class="date"><%= msg.CreatedAt.Format("2.2.2006, at 15:04") %></p>
+					</div>
+					<div class="row">
+						<p><%= msg.Msg %></p>
+					</div>
+				</div>
+			</div>
+		<% } %>	
+	</div>
+	<input type="text" placeholder="Pridat komentar..." id="message_input" class="message-input">
+</div>
+
+	
+<% contentFor("scripts") { %>
+	<script>
+		let conn = new WebSocket("ws://localhost:3000/ws")
+		conn.onmessage = function (evt) {
+			var message = JSON.parse(evt.data);
+			if (message["article"] === "<%= article.ID %>") {
+				let pom = 
+				'		<div class="row">'+
+				'			<div class="col-md-1 profil-img" style="background-image:url(\'https://placeimg.com/640/480/people\')"></div>'+
+				'			<div class="col-md-11 coment">'+
+				'				<div class="title row">'+
+				'					<p class="name"><%= current_user.FirstName + " " + current_user.LastName %> </p>'+
+				'					<p class="date">23.3.2018</p>'+
+				'				</div>'+
+				'				<div class="row">'+
+				'					<p>'+ message['msg'] +'</p>'+
+				'				</div>'+
+				'			</div>'+
+				'		</div>';
+				$(".message").append(pom)
+			}
+		};
+		$("#message_input").change(function() {
+			let msg = {
+				"msg": $("#message_input").val(),
+				"article": "<%= article.ID %>",
+				"user": "<%= current_user.ID %>"
+			}
+			conn.send(JSON.stringify(msg))
+			$("#message_input").val("")
+
+			$.ajax({
+                method: "POST",
+                url: "/async/create-message",
+                data: { 
+					msg: msg["msg"],
+					article: msg["article"],
+					user: msg["user"],
+                    authenticity_token: "<%= authenticity_token %>"
+                }
+              })
+            .done(function(data) {
+				if (data === "true") {
+					writeNoty("Message was created successfully", "success")
+				} else {
+					writeNoty("You need to log in to add comments!!!", "error")
+				}
+            });
+		})
+	</script>
+<% } %>

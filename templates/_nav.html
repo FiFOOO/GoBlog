@@ -11,7 +11,7 @@
 		</div>
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li class="<%= if (current_path == rootPath()) { %> active <% } %>"><a href="<%= rootPath() %>">Home</a></li>
+				<li class="<%= if (current_path ~= homePath()) { %> active <% } %>"><a href="<%= homePath() %>">Home</a></li>
 				<%= if (current_user) { %>
 					<li class="<%= if (current_path ~= articlesPath()) { %> active <% } %>"><a href="<%= articlesPath() %>">Articles</a></li>
 				<% } %>

@@ -3,15 +3,17 @@ package actions
 import (
 	"strings"
 
+	"github.com/gorilla/websocket"
+
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/buffalo/middleware"
+	"github.com/gobuffalo/buffalo/middleware/csrf"
 	"github.com/gobuffalo/buffalo/middleware/ssl"
 	"github.com/gobuffalo/envy"
 	strip "github.com/grokify/html-strip-tags-go"
 	"github.com/unrolled/secure"
 
 	"github.com/Filip/blog/models"
-	"github.com/gobuffalo/buffalo/middleware/csrf"
 	"github.com/gobuffalo/buffalo/middleware/i18n"
 	"github.com/gobuffalo/packr"
 
@@ -23,6 +25,13 @@ import (
 var ENV = envy.Get("GO_ENV", "development")
 var app *buffalo.App
 var T *i18n.Translator
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+var broadcast = make(chan Message)
+var clients = make(map[*websocket.Conn]bool)
 
 // App is where all routes and middleware for buffalo
 // should be defined. This is the nerve center of your
@@ -60,7 +69,15 @@ func App() *buffalo.App {
 				return next(c)
 			}
 		})
+
 		app.GET("/", HomeHandler)
+		app.GET("/home", VisitorHandler)
+		app.GET("/article-detail/{article_id}", VisitorArticleShowHandler)
+		app.POST("/async/search-article", VisitorSearchArticleHandler)
+		app.POST("/async/create-message", CreateMessage)
+		app.GET("/ws", MassageHandler)
+
+		go handleMessages()
 
 		app.Use(SetCurrentUser)
 		app.Use(Authorize)
@@ -69,9 +86,8 @@ func App() *buffalo.App {
 		app.GET("/signin", AuthNew)
 		app.POST("/signin", AuthCreate)
 		app.DELETE("/signout", AuthDestroy)
-		app.Middleware.Skip(Authorize, HomeHandler, UsersNew, UsersCreate, AuthNew, AuthCreate)
+		app.Middleware.Skip(Authorize, HomeHandler, VisitorHandler, VisitorArticleShowHandler, VisitorSearchArticleHandler, UsersNew, UsersCreate, AuthNew, AuthCreate)
 		app.Resource("/articles", ArticlesResource{})
-
 		app.ServeFiles("/", assetsBox) // serve files from the public directory
 	}
 

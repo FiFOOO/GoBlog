@@ -5,7 +5,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/gosimple/slug"
 
 	"github.com/gobuffalo/buffalo/binding"
 	"github.com/gobuffalo/pop"
@@ -50,13 +54,16 @@ func (a *Article) BeforeCreate(tx *pop.Connection) error {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return errors.WithStack(err)
 	}
-	f, err := os.Create(filepath.Join(dir, a.TitleImage.Filename))
+	name := strings.Split(a.TitleImage.Filename, ".")
+	ext := name[len(name)-1]
+	filename := slug.Make(name[0]) + "_" + strconv.FormatInt(time.Now().Unix(), 10) + "." + ext
+	f, err := os.Create(filepath.Join(dir, filename))
 	if err != nil {
 		return errors.WithStack(err)
 	}
 	defer f.Close()
 	_, err = io.Copy(f, a.TitleImage)
-	a.PathToTitleImage = filepath.Join("media/article-image", a.TitleImage.Filename)
+	a.PathToTitleImage = filepath.Join("media/article-image", filename)
 	return err
 }
 

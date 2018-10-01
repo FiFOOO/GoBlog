@@ -23,6 +23,8 @@ type User struct {
 	Password             string    `json:"-" db:"-"`
 	PasswordConfirmation string    `json:"-" db:"-"`
 	Articles             Articles  `has_many:"articles"`
+	FirstName            string    `json:"first_name" db:"first_name"`
+	LastName             string    `json:"last_name" db:"last_name"`
 }
 
 // String is not required by pop and may be deleted
@@ -45,6 +47,8 @@ func (u Users) String() string {
 func (u *User) Validate(tx *pop.Connection) (*validate.Errors, error) {
 	var err error
 	return validate.Validate(
+		&validators.StringIsPresent{Field: u.FirstName, Name: "First Name"},
+		&validators.StringIsPresent{Field: u.LastName, Name: "Last Name"},
 		&validators.StringIsPresent{Field: u.Email, Name: "Email"},
 		&validators.StringIsPresent{Field: u.PasswordHash, Name: "PasswordHash"},
 		// check to see if the email address is already taken:

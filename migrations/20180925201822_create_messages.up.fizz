@@ -1,0 +1,6 @@
+create_table("messages") {
+	t.Column("id", "uuid", {"primary": true})
+	t.Column("msg", "string", {})
+	t.Column("article_id", "string", {})
+	t.Column("user_id", "string", {})
+}
