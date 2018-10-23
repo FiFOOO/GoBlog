@@ -105,9 +105,11 @@ func CreateMessage(c buffalo.Context) error {
 }
 
 type Message struct {
-	Msg     string `json:"msg"`
-	Article string `json:"article"`
-	User    string `json:"user"`
+	Msg       string `json:"msg"`
+	Article   string `json:"article"`
+	UserID    string `json:"user"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
 }
 
 func MassageHandler(c buffalo.Context) error {
@@ -120,13 +122,25 @@ func MassageHandler(c buffalo.Context) error {
 	clients[conn] = true
 	for {
 		var msg Message
-		err := conn.ReadJSON(&msg)
-
-		if err != nil {
+		if err := conn.ReadJSON(&msg); err != nil {
 			log.Printf("error: %v", err)
 			delete(clients, conn)
 			break
 		}
+
+		user := &models.User{}
+		tx, ok := c.Value("tx").(*pop.Connection)
+		if !ok {
+			return errors.WithStack(errors.New("no transaction found"))
+		}
+
+		if err := tx.Find(user, msg.UserID); err != nil {
+			log.Printf("error: %v", err)
+			delete(clients, conn)
+			break
+		}
+		msg.FirstName = user.FirstName
+		msg.LastName = user.LastName
 		broadcast <- msg
 	}
 

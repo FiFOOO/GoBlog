@@ -15,7 +15,6 @@
 </div>
 
 
-
 <div class="col-md-10 col-md-offset-1">
 	<div class="message">
 		<%= for (msg) in messages { %>
@@ -41,14 +40,15 @@
 	<script>
 		let conn = new WebSocket("ws://localhost:3000/ws")
 		conn.onmessage = function (evt) {
-			var message = JSON.parse(evt.data);
+			let message = JSON.parse(evt.data);
+			// TODO: edit date
 			if (message["article"] === "<%= article.ID %>") {
 				let pom = 
 				'		<div class="row">'+
 				'			<div class="col-md-1 profil-img" style="background-image:url(\'https://placeimg.com/640/480/people\')"></div>'+
 				'			<div class="col-md-11 coment">'+
 				'				<div class="title row">'+
-				'					<p class="name"><%= current_user.FirstName + " " + current_user.LastName %> </p>'+
+				'					<p class="name">'+ `${message.first_name} ${message.last_name}` +'</p>'+
 				'					<p class="date">23.3.2018</p>'+
 				'				</div>'+
 				'				<div class="row">'+
@@ -58,33 +58,32 @@
 				'		</div>';
 				$(".message").append(pom)
 			}
-		};
-		$("#message_input").change(function() {
-			let msg = {
-				"msg": $("#message_input").val(),
-				"article": "<%= article.ID %>",
-				"user": "<%= current_user.ID %>"
-			}
-			conn.send(JSON.stringify(msg))
-			$("#message_input").val("")
-
 			$.ajax({
                 method: "POST",
                 url: "/async/create-message",
                 data: { 
-					msg: msg["msg"],
-					article: msg["article"],
-					user: msg["user"],
+					msg: message["msg"],
+					article: message["article"],
+					user: message["user"],
                     authenticity_token: "<%= authenticity_token %>"
-                }
-              })
-            .done(function(data) {
+				}
+			}).done(function(data) {
 				if (data === "true") {
 					writeNoty("Message was created successfully", "success")
 				} else {
 					writeNoty("You need to log in to add comments!!!", "error")
 				}
             });
+		};
+		$("#message_input").change(function() {
+			let user = '<%= if (current_user) { %> <%= current_user.ID %> <% } %>';
+			let msg = {
+				"msg": $("#message_input").val(),
+				"article": "<%= article.ID %>",
+				"user": user.trim()
+			}
+			conn.send(JSON.stringify(msg))
+			$("#message_input").val("")
 		})
 	</script>
 <% } %>
