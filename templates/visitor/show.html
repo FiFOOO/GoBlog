@@ -82,7 +82,12 @@
 				"article": "<%= article.ID %>",
 				"user": user.trim()
 			}
-			conn.send(JSON.stringify(msg))
+
+			if (conn.readyState === 3) {
+				writeNoty("You need to log in to add comments!!!", "error")
+			} else {
+				conn.send(JSON.stringify(msg))
+			}
 			$("#message_input").val("")
 		})
 	</script>

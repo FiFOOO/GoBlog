@@ -21,5 +21,6 @@
 
 <%= contentOf("scripts") %>
 <script>
-	let flash = <%= json(flash) %>;
+	let flash = '<%= json(flash) %>';
+	if (flash) flash = JSON.parse(flash)
 </script>
